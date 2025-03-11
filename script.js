@@ -1,6 +1,20 @@
 let tg = window.Telegram.WebApp;
 tg.expand();
 
+// Проверка инициализации Telegram WebApp
+if (window.Telegram && window.Telegram.WebApp) {
+    let tg = window.Telegram.WebApp;
+    tg.expand();
+    
+    // Настройка темы
+    document.documentElement.style.setProperty('--tg-theme-bg-color', tg.backgroundColor);
+    document.documentElement.style.setProperty('--tg-theme-text-color', tg.textColor);
+    document.documentElement.style.setProperty('--tg-theme-hint-color', tg.backgroundColor);
+    document.documentElement.style.setProperty('--tg-theme-link-color', tg.linkColor);
+    document.documentElement.style.setProperty('--tg-theme-button-color', tg.buttonColor);
+    document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.buttonTextColor);
+}
+
 const banksData = [
     {
         name: "Сбербанк",

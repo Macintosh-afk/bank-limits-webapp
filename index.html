@@ -3,12 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Лимиты по банкам</title>
-    <meta http-equiv="refresh" content="0; url=bank_limits.html">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
+        // Инициализация Telegram WebApp
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        // Перенаправление на основную страницу
         window.location.href = "bank_limits.html";
     </script>
 </head>
 <body>
-    <p>Перенаправление на <a href="bank_limits.html">страницу с лимитами банков</a>...</p>
+    <p>Перенаправление на страницу с лимитами банков...</p>
 </body>
 </html>
