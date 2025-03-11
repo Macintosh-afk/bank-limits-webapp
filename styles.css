@@ -5,6 +5,8 @@
     --tg-theme-link-color: #2481cc;
     --tg-theme-button-color: #2481cc;
     --tg-theme-button-text-color: #fff;
+    --table-header-bg: #1c2733;
+    --table-row-hover: rgba(36, 129, 204, 0.1);
 }
 
 body {
@@ -13,6 +15,7 @@ body {
     padding: 16px;
     background: var(--tg-theme-bg-color);
     color: var(--tg-theme-text-color);
+    line-height: 1.5;
 }
 
 .container {
@@ -20,58 +23,137 @@ body {
     margin: 0 auto;
 }
 
+h1 {
+    text-align: center;
+    margin-bottom: 24px;
+    color: var(--table-header-bg);
+}
+
+.controls-container {
+    margin-bottom: 24px;
+}
+
 .search-container {
     margin-bottom: 16px;
     display: flex;
-    gap: 8px;
+    gap: 12px;
 }
 
 #searchInput {
     flex: 1;
-    padding: 8px;
+    padding: 12px;
     border: 1px solid var(--tg-theme-hint-color);
     border-radius: 8px;
     font-size: 14px;
 }
 
-#filterType {
-    padding: 8px;
+select {
+    padding: 12px;
     border: 1px solid var(--tg-theme-hint-color);
     border-radius: 8px;
     font-size: 14px;
+    min-width: 150px;
+    background-color: white;
+}
+
+.filters-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-weight: 500;
+    color: var(--table-header-bg);
+}
+
+.status-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.status-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
 }
 
 .table-container {
     overflow-x: auto;
-    margin-bottom: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
+    background: white;
 }
 
 th, td {
-    border: 1px solid var(--tg-theme-hint-color);
-    padding: 8px;
+    padding: 12px;
     text-align: left;
+    border-bottom: 1px solid #eee;
 }
 
 th {
-    background: var(--tg-theme-secondary-bg-color);
+    background: var(--table-header-bg);
+    color: white;
+    font-weight: 500;
     position: sticky;
     top: 0;
 }
 
-tr:nth-child(even) {
-    background: rgba(0, 0, 0, 0.05);
+tr:hover {
+    background: var(--table-row-hover);
 }
 
 .bank-name {
-    white-space: nowrap;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.limit {
-    white-space: nowrap;
+.bank-status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.note {
+    color: var(--tg-theme-hint-color);
+    font-size: 13px;
+    max-width: 300px;
+}
+
+@media (max-width: 768px) {
+    .filters-container {
+        flex-direction: column;
+    }
+    
+    .status-filters {
+        flex-direction: column;
+    }
+    
+    .table-container {
+        font-size: 13px;
+    }
+    
+    th, td {
+        padding: 8px;
+    }
 }

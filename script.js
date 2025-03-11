@@ -340,6 +340,76 @@ const banksData = [
     }
 ];
 
+function parseLimitValue(limit) {
+    if (!limit) return 0;
+    if (limit.includes('безлимит')) return Infinity;
+    
+    const number = limit.match(/(\d+(?:\.\d+)?)/);
+    if (!number) return 0;
+    
+    const value = parseFloat(number[0]);
+    if (limit.includes('млн')) return value * 1000000;
+    if (limit.includes('млн')) return value * 1000000;
+    if (limit.includes('к')) return value * 1000;
+    return value;
+}
+
+function sortBanks(banks, sortBy) {
+    return [...banks].sort((a, b) => {
+        switch(sortBy) {
+            case 'name':
+                return a.name.localeCompare(b.name);
+            case 'limitDay':
+                return parseLimitValue(a.limitDay) - parseLimitValue(b.limitDay);
+            case 'limitDayDesc':
+                return parseLimitValue(b.limitDay) - parseLimitValue(a.limitDay);
+            case 'limitMonth':
+                return parseLimitValue(a.limitMonth) - parseLimitValue(b.limitMonth);
+            case 'limitMonthDesc':
+                return parseLimitValue(b.limitMonth) - parseLimitValue(a.limitMonth);
+            case 'cards':
+                return parseLimitValue(a.cards) - parseLimitValue(b.cards);
+            default:
+                return 0;
+        }
+    });
+}
+
+function filterBanks() {
+    const searchText = document.getElementById('searchInput').value.toLowerCase();
+    const filterValue = document.getElementById('filterSelect').value;
+    const cardType = document.getElementById('cardTypeFilter').value;
+    const sortBy = document.getElementById('sortSelect').value;
+    const selectedStatuses = Array.from(document.querySelectorAll('.status-checkbox input:checked')).map(cb => cb.value);
+    
+    let filteredBanks = banksData.filter(bank => {
+        const matchesSearch = bank.name.toLowerCase().includes(searchText) ||
+                            bank.tariff.toLowerCase().includes(searchText);
+        
+        const matchesStatus = selectedStatuses.includes(bank.status);
+        
+        const matchesCardType = cardType === 'all' ||
+            (cardType === 'premium' && bank.tariff.toLowerCase().includes('прем')) ||
+            (cardType === 'standard' && !bank.tariff.toLowerCase().includes('прем'));
+        
+        if (!matchesSearch || !matchesStatus || !matchesCardType) return false;
+        
+        if (filterValue === 'all') return true;
+        
+        const limitDay = parseLimitValue(bank.limitDay);
+        
+        switch(filterValue) {
+            case 'high': return limitDay >= 1000000;
+            case 'medium': return limitDay >= 300000 && limitDay < 1000000;
+            case 'low': return limitDay < 300000;
+            default: return true;
+        }
+    });
+    
+    filteredBanks = sortBanks(filteredBanks, sortBy);
+    displayBanks(filteredBanks);
+}
+
 function displayBanks(banks) {
     const tbody = document.getElementById('banksTableBody');
     tbody.innerHTML = '';
@@ -366,31 +436,14 @@ function displayBanks(banks) {
     });
 }
 
-function filterBanks() {
-    const searchText = document.getElementById('searchInput').value.toLowerCase();
-    const filterValue = document.getElementById('filterSelect').value;
-    
-    let filteredBanks = banksData.filter(bank => {
-        const matchesSearch = bank.name.toLowerCase().includes(searchText) ||
-                            bank.tariff.toLowerCase().includes(searchText);
-        
-        if (filterValue === 'all') return matchesSearch;
-        
-        const limitDay = parseInt(bank.limitDay.replace(/[^0-9]/g, '')) || 0;
-        
-        switch(filterValue) {
-            case 'high': return matchesSearch && limitDay >= 1000000;
-            case 'medium': return matchesSearch && limitDay >= 500000 && limitDay < 1000000;
-            case 'low': return matchesSearch && limitDay < 500000;
-            default: return matchesSearch;
-        }
-    });
-    
-    displayBanks(filteredBanks);
-}
-
+// Добавляем слушатели событий
 document.getElementById('searchInput').addEventListener('input', filterBanks);
 document.getElementById('filterSelect').addEventListener('change', filterBanks);
+document.getElementById('cardTypeFilter').addEventListener('change', filterBanks);
+document.getElementById('sortSelect').addEventListener('change', filterBanks);
+document.querySelectorAll('.status-checkbox input').forEach(checkbox => {
+    checkbox.addEventListener('change', filterBanks);
+});
 
 // Initial display
 displayBanks(banksData);

@@ -11,27 +11,82 @@
     <div class="container">
         <h1>Лимиты по банкам</h1>
         
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Поиск банка...">
-            <select id="filterSelect">
-                <option value="all">Все банки</option>
-                <option value="active">Активные</option>
-                <option value="inactive">Неактивные</option>
-            </select>
+        <div class="controls-container">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Поиск банка...">
+                <select id="filterSelect">
+                    <option value="all">Все банки</option>
+                    <option value="high">Высокий лимит (1млн+)</option>
+                    <option value="medium">Средний лимит (300к-1млн)</option>
+                    <option value="low">Низкий лимит (<300к)</option>
+                </select>
+            </div>
+            
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label>Тип карты:</label>
+                    <select id="cardTypeFilter">
+                        <option value="all">Все типы</option>
+                        <option value="standard">Стандарт</option>
+                        <option value="premium">Премиум</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Сортировка:</label>
+                    <select id="sortSelect">
+                        <option value="name">По названию</option>
+                        <option value="limitDay">По дневному лимиту ↑</option>
+                        <option value="limitDayDesc">По дневному лимиту ↓</option>
+                        <option value="limitMonth">По месячному лимиту ↑</option>
+                        <option value="limitMonthDesc">По месячному лимиту ↓</option>
+                        <option value="cards">По количеству карт</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Статус:</label>
+                    <div class="status-filters">
+                        <label class="status-checkbox">
+                            <input type="checkbox" value="green" checked> Надежные
+                        </label>
+                        <label class="status-checkbox">
+                            <input type="checkbox" value="blue" checked> Стандартные
+                        </label>
+                        <label class="status-checkbox">
+                            <input type="checkbox" value="red" checked> С ограничениями
+                        </label>
+                        <label class="status-checkbox">
+                            <input type="checkbox" value="yellow" checked> Особые условия
+                        </label>
+                        <label class="status-checkbox">
+                            <input type="checkbox" value="purple" checked> Премиальные
+                        </label>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <table id="banksTable">
-            <thead>
-                <tr>
-                    <th>Банк</th>
-                    <th>Лимит</th>
-                    <th>Статус</th>
-                </tr>
-            </thead>
-            <tbody id="banksTableBody">
-                <!-- Данные будут добавлены через JavaScript -->
-            </tbody>
-        </table>
+        <div class="table-container">
+            <table id="banksTable">
+                <thead>
+                    <tr>
+                        <th>Банк</th>
+                        <th>Тариф</th>
+                        <th>Лимит в день</th>
+                        <th>Лимит в месяц</th>
+                        <th>Тип снятия</th>
+                        <th>Карт</th>
+                        <th>Итого в день</th>
+                        <th>Итого в месяц</th>
+                        <th>Заметка</th>
+                    </tr>
+                </thead>
+                <tbody id="banksTableBody">
+                    <!-- Данные будут добавлены через JavaScript -->
+                </tbody>
+            </table>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
