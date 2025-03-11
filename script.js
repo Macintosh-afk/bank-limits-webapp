@@ -340,25 +340,35 @@ const banksData = [
     }
 ];
 
+// Улучшенная функция для парсинга значений лимитов
 function parseLimitValue(limit) {
     if (!limit) return 0;
-    if (limit.includes('безлимит')) return Infinity;
+    if (typeof limit !== 'string') return 0;
     
-    const number = limit.match(/(\d+(?:\.\d+)?)/);
-    if (!number) return 0;
+    // Обработка "безлимит"
+    if (limit.toLowerCase().includes('безлимит')) return Infinity;
     
-    const value = parseFloat(number[0]);
-    if (limit.includes('млн')) return value * 1000000;
-    if (limit.includes('млн')) return value * 1000000;
-    if (limit.includes('к')) return value * 1000;
-    return value;
+    // Обработка диапазонов (например, "150к/350к")
+    const values = limit.split('/').map(part => {
+        const matches = part.match(/(\d+(?:\.\d+)?)/g);
+        if (!matches) return 0;
+        
+        const value = parseFloat(matches[0]);
+        if (part.includes('млн')) return value * 1000000;
+        if (part.includes('к')) return value * 1000;
+        return value;
+    });
+    
+    // Возвращаем максимальное значение из диапазона
+    return Math.max(...values);
 }
 
+// Функция сортировки
 function sortBanks(banks, sortBy) {
     return [...banks].sort((a, b) => {
         switch(sortBy) {
             case 'name':
-                return a.name.localeCompare(b.name);
+                return a.name.localeCompare(b.name, 'ru');
             case 'limitDay':
                 return parseLimitValue(a.limitDay) - parseLimitValue(b.limitDay);
             case 'limitDayDesc':
@@ -368,51 +378,80 @@ function sortBanks(banks, sortBy) {
             case 'limitMonthDesc':
                 return parseLimitValue(b.limitMonth) - parseLimitValue(a.limitMonth);
             case 'cards':
-                return parseLimitValue(a.cards) - parseLimitValue(b.cards);
+                const cardsA = a.cards.split('/')[0];
+                const cardsB = b.cards.split('/')[0];
+                return parseInt(cardsA) - parseInt(cardsB);
             default:
                 return 0;
         }
     });
 }
 
+// Функция фильтрации
 function filterBanks() {
     const searchText = document.getElementById('searchInput').value.toLowerCase();
     const filterValue = document.getElementById('filterSelect').value;
     const cardType = document.getElementById('cardTypeFilter').value;
     const sortBy = document.getElementById('sortSelect').value;
-    const selectedStatuses = Array.from(document.querySelectorAll('.status-checkbox input:checked')).map(cb => cb.value);
+    const selectedStatuses = Array.from(document.querySelectorAll('.status-chip input:checked')).map(cb => cb.value);
     
     let filteredBanks = banksData.filter(bank => {
+        // Поиск по тексту
         const matchesSearch = bank.name.toLowerCase().includes(searchText) ||
-                            bank.tariff.toLowerCase().includes(searchText);
+                            bank.tariff.toLowerCase().includes(searchText) ||
+                            bank.note.toLowerCase().includes(searchText);
         
+        // Проверка статуса
         const matchesStatus = selectedStatuses.includes(bank.status);
         
+        // Проверка типа карты
         const matchesCardType = cardType === 'all' ||
-            (cardType === 'premium' && bank.tariff.toLowerCase().includes('прем')) ||
-            (cardType === 'standard' && !bank.tariff.toLowerCase().includes('прем'));
+            (cardType === 'premium' && (
+                bank.tariff.toLowerCase().includes('прем') ||
+                bank.tariff.toLowerCase().includes('black') ||
+                bank.tariff.toLowerCase().includes('ультра')
+            )) ||
+            (cardType === 'standard' && !(
+                bank.tariff.toLowerCase().includes('прем') ||
+                bank.tariff.toLowerCase().includes('black') ||
+                bank.tariff.toLowerCase().includes('ультра')
+            ));
         
-        if (!matchesSearch || !matchesStatus || !matchesCardType) return false;
-        
-        if (filterValue === 'all') return true;
-        
+        // Проверка лимита
+        let matchesLimit = true;
         const limitDay = parseLimitValue(bank.limitDay);
         
-        switch(filterValue) {
-            case 'high': return limitDay >= 1000000;
-            case 'medium': return limitDay >= 300000 && limitDay < 1000000;
-            case 'low': return limitDay < 300000;
-            default: return true;
+        if (filterValue === 'high') {
+            matchesLimit = limitDay >= 1000000;
+        } else if (filterValue === 'medium') {
+            matchesLimit = limitDay >= 300000 && limitDay < 1000000;
+        } else if (filterValue === 'low') {
+            matchesLimit = limitDay < 300000;
         }
+
+        return matchesSearch && matchesStatus && matchesCardType && matchesLimit;
     });
     
+    // Сортировка результатов
     filteredBanks = sortBanks(filteredBanks, sortBy);
     displayBanks(filteredBanks);
 }
 
+// Функция отображения
 function displayBanks(banks) {
     const tbody = document.getElementById('banksTableBody');
     tbody.innerHTML = '';
+    
+    if (banks.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td colspan="9" style="text-align: center; padding: 20px;">
+                Банки не найдены
+            </td>
+        `;
+        tbody.appendChild(row);
+        return;
+    }
     
     banks.forEach(bank => {
         const row = document.createElement('tr');
@@ -436,14 +475,39 @@ function displayBanks(banks) {
     });
 }
 
-// Добавляем слушатели событий
-document.getElementById('searchInput').addEventListener('input', filterBanks);
-document.getElementById('filterSelect').addEventListener('change', filterBanks);
-document.getElementById('cardTypeFilter').addEventListener('change', filterBanks);
-document.getElementById('sortSelect').addEventListener('change', filterBanks);
-document.querySelectorAll('.status-checkbox input').forEach(checkbox => {
-    checkbox.addEventListener('change', filterBanks);
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    // Инициализация поиска
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', filterBanks);
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            searchInput.value = '';
+            filterBanks();
+        }
+    });
+    
+    // Инициализация фильтров
+    document.getElementById('filterSelect').addEventListener('change', filterBanks);
+    document.getElementById('cardTypeFilter').addEventListener('change', filterBanks);
+    document.getElementById('sortSelect').addEventListener('change', filterBanks);
+    
+    // Инициализация чекбоксов статуса
+    document.querySelectorAll('.status-chip input').forEach(checkbox => {
+        checkbox.addEventListener('change', filterBanks);
+    });
+
+    // Начальное отображение данных
+    displayBanks(banksData);
 });
 
-// Initial display
-displayBanks(banksData);
+// Обработка ошибок
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+    console.error('Ошибка:', {
+        message: msg,
+        line: lineNo,
+        column: columnNo,
+        error: error
+    });
+    return false;
+};
