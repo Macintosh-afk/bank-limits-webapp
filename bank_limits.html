@@ -6,89 +6,95 @@
     <title>Лимиты по банкам</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>Лимиты по банкам</h1>
-        
-        <div class="controls-wrapper">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Поиск банка...">
-                <select id="filterSelect" class="main-filter">
-                    <option value="all">Все банки</option>
+    <div class="app-container">
+        <div class="header">
+            <h1> Банковские лимиты </h1>
+            <p>Выберите банк и тип карты для просмотра лимитов</p>            
+            <div class="search-container">
+                <div class="search-box">
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M21.71 20.29L18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.39zM11 18a7 7 0 1 1 7-7 7 7 0 0 1-7 7z"/>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Поиск банка...">
+                </div>
+                
+                <select id="filterSelect" class="primary-select">
+                    <option value="all">Все лимиты</option>
                     <option value="high">Высокий лимит (1млн+)</option>
                     <option value="medium">Средний лимит (300к-1млн)</option>
                     <option value="low">Низкий лимит (<300к)</option>
                 </select>
             </div>
+        </div>
 
-            <div class="filters-panel">
-                <div class="filter-section">
-                    <div class="filter-label">Тип карты</div>
-                    <select id="cardTypeFilter" class="styled-select">
-                        <option value="all">Все типы</option>
-                        <option value="standard">Стандарт</option>
-                        <option value="premium">Премиум</option>
-                    </select>
-                </div>
+        <div class="filters-bar">
+            <div class="filter-group">
+                <label class="filter-label">Тип карты</label>
+                <select id="cardTypeFilter" class="styled-select">
+                    <option value="all">Все типы</option>
+                    <option value="standard">Стандарт</option>
+                    <option value="premium">Премиум</option>
+                </select>
+            </div>
 
-                <div class="filter-section">
-                    <div class="filter-label">Сортировка</div>
-                    <select id="sortSelect" class="styled-select">
-                        <option value="name">По названию</option>
-                        <option value="limitDayDesc">Макс. лимит в день ↓</option>
-                        <option value="limitDay">Мин. лимит в день ↑</option>
-                        <option value="limitMonthDesc">Макс. лимит в месяц ↓</option>
-                        <option value="limitMonth">Мин. лимит в месяц ↑</option>
-                        <option value="cards">По количеству карт</option>
-                    </select>
-                </div>
+            <div class="filter-group">
+                <label class="filter-label">Сортировка</label>
+                <select id="sortSelect" class="styled-select">
+                    <option value="name">По названию</option>
+                    <option value="limitDayDesc">Макс. лимит в день ↓</option>
+                    <option value="limitDay">Мин. лимит в день ↑</option>
+                    <option value="limitMonthDesc">Макс. лимит в месяц ↓</option>
+                    <option value="limitMonth">Мин. лимит в месяц ↑</option>
+                    <option value="cards">По количеству карт</option>
+                </select>
+            </div>
 
-                <div class="filter-section">
-                    <div class="filter-label">Статус банка</div>
-                    <div class="status-filters">
-                        <label class="status-chip">
-                            <input type="checkbox" value="green" checked>
-                            <span class="chip-content">
-                                <span class="status-dot green"></span>
-                                Надежные
-                            </span>
-                        </label>
-                        <label class="status-chip">
-                            <input type="checkbox" value="blue" checked>
-                            <span class="chip-content">
-                                <span class="status-dot blue"></span>
-                                Стандартные
-                            </span>
-                        </label>
-                        <label class="status-chip">
-                            <input type="checkbox" value="red" checked>
-                            <span class="chip-content">
-                                <span class="status-dot red"></span>
-                                С ограничениями
-                            </span>
-                        </label>
-                        <label class="status-chip">
-                            <input type="checkbox" value="yellow" checked>
-                            <span class="chip-content">
-                                <span class="status-dot yellow"></span>
-                                Особые условия
-                            </span>
-                        </label>
-                        <label class="status-chip">
-                            <input type="checkbox" value="purple" checked>
-                            <span class="chip-content">
-                                <span class="status-dot purple"></span>
-                                Премиальные
-                            </span>
-                        </label>
-                    </div>
+            <div class="filter-group status-group">
+                <label class="filter-label">Статус банка</label>
+                <div class="status-chips">
+                    <label class="status-chip">
+                        <input type="checkbox" value="green" checked>
+                        <span class="chip-content">
+                            <span class="status-indicator green"></span>
+                            Надежные
+                        </span>
+                    </label>
+                    <label class="status-chip">
+                        <input type="checkbox" value="blue" checked>
+                        <span class="chip-content">
+                            <span class="status-indicator blue"></span>
+                            Стандартные
+                        </span>
+                    </label>
+                    <label class="status-chip">
+                        <input type="checkbox" value="red" checked>
+                        <span class="chip-content">
+                            <span class="status-indicator red"></span>
+                            С ограничениями
+                        </span>
+                    </label>
+                    <label class="status-chip">
+                        <input type="checkbox" value="yellow" checked>
+                        <span class="chip-content">
+                            <span class="status-indicator yellow"></span>
+                            Особые условия
+                        </span>
+                    </label>
+                    <label class="status-chip">
+                        <input type="checkbox" value="purple" checked>
+                        <span class="chip-content">
+                            <span class="status-indicator purple"></span>
+                            Премиальные
+                        </span>
+                    </label>
                 </div>
             </div>
         </div>
 
-        <div class="table-wrapper">
+        <div class="table-container">
             <table id="banksTable">
                 <thead>
                     <tr>
